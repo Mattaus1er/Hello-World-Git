@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Street Tournament - Présentation Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #1c1917; /* stone-900 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .active-tab {
+            border-bottom: 2px solid #ea580c; /* orange-600 */
+            color: #ea580c;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Urban Neutrals (Stone/Warm Grey) with Energetic Orange Accents. Represents the "Street" aspect while maintaining a clean, professional "Tournament" feel. -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Hook the user with the concept of "Street Kings".
+         2. Strategic Squad Builder: An interactive visual to explain the complex "Split Rule" (3 vs 2 players) immediately, as it's the core strategic constraint.
+         3. The Arena (Phases): A grid of interactive cards detailing each game phase.
+         4. Scoring Simulation: A Chart.js visualization specifically designed to demonstrate the "Remontada" concept, proving that early losses don't mean defeat (addressing the user's core concern about competitiveness).
+         5. Timeline & Logistics: A vertical flow to visualize the day.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Squad Split: HTML/CSS Flex layout with interactive toggle. Goal: Explain roster constraints clearly without text walls.
+         2. Phase Cards: Grid layout. Goal: Quick overview of 5 games. Interaction: Click to expand details.
+         3. Scoring Chart: Stacked Bar Chart (Chart.js). Goal: Compare a "Consistent" team vs a "Comeback" team to prove the scoring system works.
+         4. Timeline: Vertical Flex list. Goal: Linear progression of the event.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-stone-100/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-bold text-2xl tracking-tighter text-stone-900">GAME STREET<span class="text-orange-600">.</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('concept')" class="text-stone-600 hover:text-orange-600 px-3 py-2 text-sm font-medium transition-colors">Le Concept</button>
+                    <button onclick="scrollToSection('squad')" class="text-stone-600 hover:text-orange-600 px-3 py-2 text-sm font-medium transition-colors">La Stratégie</button>
+                    <button onclick="scrollToSection('arena')" class="text-stone-600 hover:text-orange-600 px-3 py-2 text-sm font-medium transition-colors">Les 5 Arènes</button>
+                    <button onclick="scrollToSection('scoring')" class="text-stone-600 hover:text-orange-600 px-3 py-2 text-sm font-medium transition-colors">Points & Victoire</button>
+                    <button onclick="scrollToSection('timeline')" class="text-stone-600 hover:text-orange-600 px-3 py-2 text-sm font-medium transition-colors">Planning</button>
+                </div>
+                <!-- Mobile menu button placeholder -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-stone-500 hover:text-stone-900 focus:outline-none">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-stone-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="scrollToSection('concept'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-stone-50">Le Concept</button>
+                <button onclick="scrollToSection('squad'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-stone-50">La Stratégie</button>
+                <button onclick="scrollToSection('arena'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-stone-50">Les Arènes</button>
+                <button onclick="scrollToSection('scoring'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-stone-50">Points</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="concept" class="relative bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 px-4 sm:px-6 lg:px-8 pt-20">
+                <main class="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
+                    <div class="sm:text-center lg:text-left">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-stone-900 sm:text-5xl md:text-6xl">
+                            <span class="block xl:inline">Plus qu'un tournoi.</span>
+                            <span class="block text-orange-600 xl:inline">Devenez Street Kings.</span>
+                        </h1>
+                        <p class="mt-3 text-base text-stone-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Une compétition e-sport urbaine par équipes de 5. Cohésion, stratégie et polyvalence sont vos seules armes pour conquérir les 5 phases du tournoi.
+                        </p>
+                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <button onclick="scrollToSection('squad')" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 md:py-4 md:text-lg transition-all">
+                                    Découvrir la Stratégie
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-stone-100 flex items-center justify-center border-l border-stone-200">
+            <div class="text-stone-300 font-bold text-9xl opacity-20 transform -rotate-12 select-none">
+                GST
+            </div>
+        </div>
+    </header>
+
+    <!-- Strategy Section: The Split -->
+    <section id="squad" class="py-16 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-stone-900">La Stratégie d'Équipe</h2>
+                <p class="mt-4 text-lg text-stone-500 max-w-3xl mx-auto">
+                    Vous avez 5 joueurs. Vous ne pouvez pas les utiliser n'importe comment. La "Règle du Split" impose un choix crucial dès le début. Visualisez la répartition ci-dessous.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl mx-auto border border-stone-200">
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-xl font-bold text-stone-800">Votre Roster (5 Joueurs)</h3>
+                            <p class="text-sm text-stone-500">Cliquez sur les groupes pour voir les restrictions.</p>
+                        </div>
+                        <div class="flex space-x-2 p-1 bg-stone-100 rounded-lg">
+                            <button id="btn-storm" onclick="updateSquadView('storm')" class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-white text-stone-900 shadow-sm">Phase Storm 4</button>
+                            <button id="btn-fc" onclick="updateSquadView('fc')" class="px-4 py-2 rounded-md text-sm font-medium transition-all text-stone-500 hover:text-stone-900">Phase FC 25</button>
+                        </div>
+                    </div>
+
+                    <!-- Visual Representation -->
+                    <div class="flex justify-center items-center gap-4 md:gap-8 mb-8">
+                        <!-- Player Icons -->
+                        <div id="p1" class="w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500 transform scale-110 ring-4 ring-orange-500 bg-orange-100 text-orange-700">J1</div>
+                        <div id="p2" class="w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500 transform scale-110 ring-4 ring-orange-500 bg-orange-100 text-orange-700">J2</div>
+                        <div id="p3" class="w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500 transform scale-110 ring-4 ring-orange-500 bg-orange-100 text-orange-700">J3</div>
+                        <div class="w-px h-24 bg-stone-300 mx-2"></div>
+                        <div id="p4" class="w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500 opacity-50">J4</div>
+                        <div id="p5" class="w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500 opacity-50">J5</div>
+                    </div>
+
+                    <div id="squad-desc" class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-md">
+                        <h4 class="font-bold text-orange-800">Le Commando Storm</h4>
+                        <p class="text-orange-700">Ces 3 joueurs participent au tournoi Ninja. <span class="font-bold">ILS SONT INTERDITS DE JEU</span> pour la phase FC 25.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The 5 Arenas (Phases) -->
+    <section id="arena" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-stone-900">Les 5 Arènes</h2>
+                <p class="mt-4 text-lg text-stone-500">Un parcours conçu pour tester toutes les compétences : Combat, Course, Sport, Rythme.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1: Storm 4 -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 card-hover transition-all duration-300 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Phase 1 : Storm 4</h3>
+                        <span class="px-2 py-1 bg-stone-200 text-xs font-bold rounded text-stone-600">3 Joueurs</span>
+                    </div>
+                    <div class="h-1 w-12 bg-orange-500 mb-4 rounded"></div>
+                    <p class="text-stone-600 mb-4">Le tournoi des stratèges. Format élimination directe.</p>
+                    <ul class="text-sm text-stone-500 space-y-2 mb-4">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-orange-500">▶</span>
+                            <span><strong>Règle du Relais :</strong> Un joueur doit attendre 2 tours avant de rejouer.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Blur -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 card-hover transition-all duration-300 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Phase 2 : Blur</h3>
+                        <span class="px-2 py-1 bg-stone-200 text-xs font-bold rounded text-stone-600">Full Team (5)</span>
+                    </div>
+                    <div class="h-1 w-12 bg-blue-500 mb-4 rounded"></div>
+                    <p class="text-stone-600 mb-4">La course au chaos en réseau local (LAN).</p>
+                    <ul class="text-sm text-stone-500 space-y-2 mb-4">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-blue-500">▶</span>
+                            <span><strong>Simultané :</strong> Tous les joueurs s'affrontent en même temps.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-blue-500">▶</span>
+                            <span><strong>Scoring :</strong> Cumul des places des 5 joueurs.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: FC 25 -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 card-hover transition-all duration-300 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Phase 3 : FC 25</h3>
+                        <span class="px-2 py-1 bg-stone-200 text-xs font-bold rounded text-stone-600">2 Joueurs</span>
+                    </div>
+                    <div class="h-1 w-12 bg-green-600 mb-4 rounded"></div>
+                    <p class="text-stone-600 mb-4">Le football virtuel. Le moment du rattrapage.</p>
+                    <ul class="text-sm text-stone-500 space-y-2 mb-4">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-green-600">▶</span>
+                            <span><strong>Restriction :</strong> Uniquement les 2 joueurs n'ayant PAS joué à Storm 4.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-green-600">▶</span>
+                            <span><strong>Bonus :</strong> +5 pts si victoire "Perfect" (3-0).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Just Dance -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 card-hover transition-all duration-300 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Phase 4 : Just Dance</h3>
+                        <span class="px-2 py-1 bg-stone-200 text-xs font-bold rounded text-stone-600">1-2 Joueurs</span>
+                    </div>
+                    <div class="h-1 w-12 bg-pink-500 mb-4 rounded"></div>
+                    <p class="text-stone-600 mb-4">Endurance physique et sens du rythme.</p>
+                    <ul class="text-sm text-stone-500 space-y-2 mb-4">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-pink-500">▶</span>
+                            <span><strong>Show :</strong> Épreuve sur scène devant le public.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-pink-500">▶</span>
+                            <span><strong>Libre :</strong> N'importe quel membre de l'équipe peut participer.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 5: Brawlhalla -->
+                <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 card-hover transition-all duration-300 group">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Phase 5 : Brawlhalla</h3>
+                        <span class="px-2 py-1 bg-stone-200 text-xs font-bold rounded text-stone-600">2 Joueurs (Libre)</span>
+                    </div>
+                    <div class="h-1 w-12 bg-yellow-500 mb-4 rounded"></div>
+                    <p class="text-stone-600 mb-4">Le Tie-Breaker nerveux. Tout peut basculer.</p>
+                    <ul class="text-sm text-stone-500 space-y-2 mb-4">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-yellow-500">▶</span>
+                            <span><strong>Enjeu :</strong> Coefficients élevés pour la fin de tournoi.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-yellow-500">▶</span>
+                            <span><strong>Bounty :</strong> Récompense immédiate pour les vainqueurs de phase.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scoring System: The Hope Mechanics -->
+    <section id="scoring" class="py-16 bg-stone-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white">Street Points : Gardez l'Espoir</h2>
+                    <p class="mt-4 text-stone-400 text-lg">
+                        Nous avons conçu un système de points cumulatifs pour éviter l'élimination précoce. 
+                        Perdre une phase n'est pas la fin. 
+                    </p>
+                    
+                    <div class="mt-8 space-y-4">
+                        <div class="flex items-center justify-between border-b border-stone-700 pb-2">
+                            <span>Vainqueur de Phase</span>
+                            <span class="font-bold text-orange-500">100 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-stone-700 pb-2">
+                            <span>Finaliste</span>
+                            <span class="font-bold text-stone-300">70 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-stone-700 pb-2">
+                            <span>Demi-finalistes (Top 4)</span>
+                            <span class="font-bold text-stone-400">40 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-stone-700 pb-2">
+                            <span>Quarts (Top 8)</span>
+                            <span class="font-bold text-stone-500">20 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-stone-700 pb-2">
+                            <span>Participation</span>
+                            <span class="font-bold text-stone-600">10 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-stone-800 rounded-lg border border-stone-700">
+                        <h4 class="font-bold text-orange-400 mb-2">💡 Les Primes (Bounties)</h4>
+                        <p class="text-sm text-stone-400">
+                            En plus du classement général, chaque jeu offre une récompense immédiate (Cash ou Lot) à son vainqueur. Même dernier au général, vous pouvez repartir gagnant d'une phase.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interactive Chart Container -->
+                <div class="bg-white rounded-xl p-4 text-stone-900 shadow-2xl">
+                    <h3 class="text-lg font-bold mb-2">Simulation : La Remontada</h3>
+                    <p class="text-xs text-stone-500 mb-4">Voyez comment une équipe qui échoue au début (Team Phoenix) peut rattraper une équipe moyenne (Team Regular).</p>
+                    <div class="chart-container">
+                        <canvas id="scoringChart"></canvas>
+                    </div>
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <button onclick="updateChart('start')" class="px-3 py-1 text-xs bg-stone-200 hover:bg-stone-300 rounded">Début Tournoi</button>
+                        <button onclick="updateChart('mid')" class="px-3 py-1 text-xs bg-stone-200 hover:bg-stone-300 rounded">Mi-Parcours</button>
+                        <button onclick="updateChart('end')" class="px-3 py-1 text-xs bg-orange-100 text-orange-800 font-bold hover:bg-orange-200 rounded">Résultat Final</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Schedule -->
+    <section id="timeline" class="py-16 bg-stone-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-stone-900">Planning de la Journée</h2>
+            </div>
+            
+            <div class="relative border-l-4 border-stone-200 ml-6 space-y-12">
+                <!-- 09:00 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-stone-400 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-stone-400">09h00 - 10h00</span>
+                    <h3 class="text-xl font-bold text-stone-800">Check-in & Warm-up</h3>
+                    <p class="text-stone-600 mt-1">Arrivée des équipes, installation et échauffement.</p>
+                </div>
+                <!-- 10:00 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-orange-500 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-orange-600">10h00 - 12h30</span>
+                    <h3 class="text-xl font-bold text-stone-800">Phase 1 : Storm 4</h3>
+                    <p class="text-stone-600 mt-1">Début des hostilités. Les stratèges ouvrent le bal.</p>
+                </div>
+                <!-- 12:30 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-pink-500 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-pink-600">12h30 - 13h30</span>
+                    <h3 class="text-xl font-bold text-stone-800">Pause & Just Dance</h3>
+                    <p class="text-stone-600 mt-1">Animation show pendant la pause repas. Garder l'énergie haute.</p>
+                </div>
+                <!-- 13:30 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-green-600 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-green-700">13h30 - 16h00</span>
+                    <h3 class="text-xl font-bold text-stone-800">Phase 3 : FC 25</h3>
+                    <p class="text-stone-600 mt-1">Le binôme de réserve entre en scène pour rattraper les points.</p>
+                </div>
+                <!-- 16:00 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-blue-500 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-blue-600">16h00 - 17h00</span>
+                    <h3 class="text-xl font-bold text-stone-800">Phase 2 : Blur (LAN)</h3>
+                    <p class="text-stone-600 mt-1">Chaos total. Tout le monde joue pour maximiser le score.</p>
+                </div>
+                <!-- 17:00 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-yellow-500 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-yellow-600">17h00 - 18h30</span>
+                    <h3 class="text-xl font-bold text-stone-800">Phase 5 : Brawlhalla</h3>
+                    <p class="text-stone-600 mt-1">Le finish nerveux.</p>
+                </div>
+                <!-- 18:45 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3.5 top-0 w-6 h-6 bg-stone-800 rounded-full border-4 border-stone-50"></div>
+                    <span class="text-sm font-bold text-stone-800">18h45</span>
+                    <h3 class="text-xl font-bold text-stone-800">Podium & Trophée</h3>
+                    <p class="text-stone-600 mt-1">Couronnement des Street Kings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; 2024 Game Street Tournament. Tous droits réservés.</p>
+            <p class="text-xs mt-2">Besoins Matériels : 10-20 PC LAN, 4-8 Consoles, Écrans Géants.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Mobile Menu Toggle ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Smooth Scrolling ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Strategy Section Interaction (The Split) ---
+        function updateSquadView(mode) {
+            const p1 = document.getElementById('p1');
+            const p2 = document.getElementById('p2');
+            const p3 = document.getElementById('p3');
+            const p4 = document.getElementById('p4');
+            const p5 = document.getElementById('p5');
+            const desc = document.getElementById('squad-desc');
+            const btnStorm = document.getElementById('btn-storm');
+            const btnFC = document.getElementById('btn-fc');
+
+            // Reset Styles
+            [p1, p2, p3, p4, p5].forEach(el => {
+                el.className = 'w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center text-xl font-bold text-stone-500 transition-all duration-500';
+            });
+            btnStorm.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all text-stone-500 hover:text-stone-900';
+            btnFC.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all text-stone-500 hover:text-stone-900';
+
+            if (mode === 'storm') {
+                // Highlight Storm Team (3 players)
+                [p1, p2, p3].forEach(el => {
+                    el.classList.add('transform', 'scale-110', 'ring-4', 'ring-orange-500', 'bg-orange-100', 'text-orange-700');
+                    el.classList.remove('opacity-50');
+                });
+                [p4, p5].forEach(el => el.classList.add('opacity-50'));
+                
+                desc.className = "bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-md transition-all";
+                desc.innerHTML = `<h4 class="font-bold text-orange-800">Le Commando Storm (3 Joueurs)</h4><p class="text-orange-700">Ces joueurs participent à Storm 4. <span class="font-bold">ILS NE PEUVENT PAS</span> jouer à FC 25 ensuite.</p>`;
+                
+                btnStorm.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all bg-white text-stone-900 shadow-sm border border-stone-200';
+            } else {
+                // Highlight FC Team (2 players)
+                [p4, p5].forEach(el => {
+                    el.classList.add('transform', 'scale-110', 'ring-4', 'ring-green-500', 'bg-green-100', 'text-green-700');
+                    el.classList.remove('opacity-50');
+                });
+                [p1, p2, p3].forEach(el => el.classList.add('opacity-50'));
+
+                desc.className = "bg-green-50 border-l-4 border-green-500 p-4 rounded-r-md transition-all";
+                desc.innerHTML = `<h4 class="font-bold text-green-800">Le Duo FC 25 (2 Joueurs)</h4><p class="text-green-700">Ce sont les réserves de la première phase. C'est à eux de rattraper les points si l'équipe Storm a échoué.</p>`;
+                
+                btnFC.className = 'px-4 py-2 rounded-md text-sm font-medium transition-all bg-white text-stone-900 shadow-sm border border-stone-200';
+            }
+        }
+
+        // --- Chart.js Implementation (The Hope Mechanics) ---
+        let scoringChart;
+
+        function initChart() {
+            const ctx = document.getElementById('scoringChart').getContext('2d');
+            
+            // Data logic: 
+            // Regular Team: Consistent results (Top 8, Top 8, Top 8...)
+            // Phoenix Team: Loses first game (10pts), but Wins Blur (100pts) + Top 4 FC + Win Just Dance
+            
+            scoringChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Storm 4', 'Just Dance', 'FC 25', 'Blur', 'Brawlhalla'],
+                    datasets: [
+                        {
+                            label: 'Team Regular (Moyenne)',
+                            data: [20, 20, 20, 20, 20], // Starts with Storm (Quart de finale)
+                            backgroundColor: '#a8a29e', // stone-400
+                            stack: 'Stack 0',
+                        },
+                        {
+                            label: 'Team Phoenix (Remontada)',
+                            data: [10, 0, 0, 0, 0], // Starts with Loss (Participation)
+                            backgroundColor: '#ea580c', // orange-600
+                            stack: 'Stack 1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Points Cumulés (Simulation)'
+                            },
+                            stacked: true
+                        },
+                        x: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(stage) {
+            // Simulate progression through the day
+            if (stage === 'start') {
+                // Just the first game
+                scoringChart.data.datasets[0].data = [20, 0, 0, 0, 0]; // Regular gets Top 8 (20pts)
+                scoringChart.data.datasets[1].data = [10, 0, 0, 0, 0]; // Phoenix fails (10pts)
+            } else if (stage === 'mid') {
+                // After 3 games
+                scoringChart.data.datasets[0].data = [20, 20, 20, 0, 0]; // Regular stays consistent (60 total)
+                scoringChart.data.datasets[1].data = [10, 100, 40, 0, 0]; // Phoenix WINS Dance + Top 4 FC (150 total!)
+            } else {
+                // Final Results
+                scoringChart.data.datasets[0].data = [20, 20, 20, 40, 20]; // Regular finishes nicely (120 total)
+                scoringChart.data.datasets[1].data = [10, 100, 40, 70, 40]; // Phoenix crushes (260 total)
+            }
+            scoringChart.update();
+        }
+
+        // Initialize things on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateSquadView('storm'); // Default state
+        });
+
+    </script>
+</body>
+</html>
